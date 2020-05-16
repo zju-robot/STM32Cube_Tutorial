@@ -50,7 +50,7 @@ debug_tool = stlink
 
 打开STM32CubeMX文件，切换到Project Manager界面，选择工具链为“MDK-ARM”，并确定版本：
 
-![](\Documents\img\README_01.png)
+![](https://github.com/zju-robot/STM32Cube_Tutorial/blob/master/Documents/img/README_01.png)
 
 重新生成代码，即可得到Keil工程。
 
@@ -58,6 +58,6 @@ debug_tool = stlink
 
 打开STM32CubeMX文件，切换到Project Manager界面，选择工具链为“STM32CubeIDE”：
 
-![](\Documents\img\README_02.png)
+![](https://github.com/zju-robot/STM32Cube_Tutorial/blob/master/Documents/img/README_02.png)
 
 重新生成代码，即可得到STM32CubeIDE工程。
