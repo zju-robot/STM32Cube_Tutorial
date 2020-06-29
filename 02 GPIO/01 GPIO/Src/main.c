@@ -94,11 +94,47 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1)
   {
-    HAL_GPIO_TogglePin(LED_GPIO_Port, LED_Pin);
-    HAL_Delay(500);
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
+
+    // 逐个控制LED闪烁
+    HAL_GPIO_WritePin(LED_GPIO_Port, LED_Pin, GPIO_PIN_SET);   //点亮LED
+    HAL_Delay(1000);                                           // 等待1秒
+    HAL_GPIO_WritePin(LED_GPIO_Port, LED_Pin, GPIO_PIN_RESET); //熄灭LED
+    HAL_Delay(2000);                                           //等待2秒
+    HAL_GPIO_WritePin(LED_GPIO_Port, LED_Pin, GPIO_PIN_SET);   //点亮LED
+    HAL_Delay(1000);                                           //等待1秒
+
+    // 连续闪烁10次
+    for (uint8_t i = 0; i < 20; i++) //闪烁十次代表变化了二十次电平
+    {
+      HAL_GPIO_TogglePin(LED_GPIO_Port, LED_Pin); //变化引脚上电平
+      HAL_Delay(100);                             //等待0.1秒。每两次闪烁间时间为0.1秒，故频率为5Hz
+    }
+    HAL_GPIO_WritePin(LED_GPIO_Port, LED_Pin, GPIO_PIN_RESET); //熄灭LED
+
+    // 等待按键输入三次
+    for (uint8_t i = 0; i < 3; i++)
+    {
+      // 等待按键按下
+      do
+      {
+        while (HAL_GPIO_ReadPin(Button_GPIO_Port, Button_Pin) == GPIO_PIN_SET) //等待电平变高
+          ;
+        HAL_Delay(1); //延时消抖
+
+      } while (HAL_GPIO_ReadPin(Button_GPIO_Port, Button_Pin) == GPIO_PIN_SET); //第二次检测
+
+      // 等待按键松开
+      do
+      {
+        while (HAL_GPIO_ReadPin(Button_GPIO_Port, Button_Pin) == GPIO_PIN_RESET) //等待电平变低
+          ;
+        HAL_Delay(1); //延时等待
+
+      } while (HAL_GPIO_ReadPin(Button_GPIO_Port, Button_Pin) == GPIO_PIN_RESET); //第二次检测
+    }
   }
   /* USER CODE END 3 */
 }
@@ -127,8 +163,7 @@ void SystemClock_Config(void)
   }
   /** Initializes the CPU, AHB and APB busses clocks 
   */
-  RCC_ClkInitStruct.ClockType = RCC_CLOCKTYPE_HCLK|RCC_CLOCKTYPE_SYSCLK
-                              |RCC_CLOCKTYPE_PCLK1|RCC_CLOCKTYPE_PCLK2;
+  RCC_ClkInitStruct.ClockType = RCC_CLOCKTYPE_HCLK | RCC_CLOCKTYPE_SYSCLK | RCC_CLOCKTYPE_PCLK1 | RCC_CLOCKTYPE_PCLK2;
   RCC_ClkInitStruct.SYSCLKSource = RCC_SYSCLKSOURCE_PLLCLK;
   RCC_ClkInitStruct.AHBCLKDivider = RCC_SYSCLK_DIV1;
   RCC_ClkInitStruct.APB1CLKDivider = RCC_HCLK_DIV2;
@@ -156,7 +191,7 @@ void Error_Handler(void)
   /* USER CODE END Error_Handler_Debug */
 }
 
-#ifdef  USE_FULL_ASSERT
+#ifdef USE_FULL_ASSERT
 /**
   * @brief  Reports the name of the source file and the source line number
   *         where the assert_param error has occurred.
@@ -165,7 +200,7 @@ void Error_Handler(void)
   * @retval None
   */
 void assert_failed(uint8_t *file, uint32_t line)
-{ 
+{
   /* USER CODE BEGIN 6 */
   /* User can add his own implementation to report the file name and line number,
      tex: printf("Wrong parameters value: file %s on line %d\r\n", file, line) */
