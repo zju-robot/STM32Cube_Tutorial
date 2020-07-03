@@ -97,6 +97,9 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1)
   {
+    /* USER CODE END WHILE */
+
+    /* USER CODE BEGIN 3 */
     uint8_t size = 0;
 
     // 清空缓存区
@@ -108,9 +111,6 @@ int main(void)
         size++;
 
     HAL_UART_Transmit(&huart2, data, size, 1000); //原样发送该段信息
-    /* USER CODE END WHILE */
-
-    /* USER CODE BEGIN 3 */
   }
   /* USER CODE END 3 */
 }
