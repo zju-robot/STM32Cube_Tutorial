@@ -25,7 +25,7 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-#include "buffer.h"
+#include "string.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -46,21 +46,12 @@
 /* Private variables ---------------------------------------------------------*/
 
 /* USER CODE BEGIN PV */
-buffer BufRx;  //串口接收环形缓冲区
-uint8_t tmpRx; //串口接收暂存字节
+uint8_t buffer[10];
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
-
-/**
- * @brief 从缓冲区中读出一个以指定字节结尾的字符串
- * 
- * @param str 用于存储读出来的字符串的字符数组指针
- * @param buf 需要读取的缓冲区
- * @param end 用于辨识字符串是否结束的字节
- * @return uint16_t 读出的字符串的长度
- */
-uint16_t read(char *str, buffer *buf, char end);
+void SystemClock_Config(void);
+/* USER CODE BEGIN PFP */
 
 /* USER CODE END PFP */
 
@@ -76,7 +67,7 @@ uint16_t read(char *str, buffer *buf, char end);
 int main(void)
 {
   /* USER CODE BEGIN 1 */
-  char str[80];
+
   /* USER CODE END 1 */
 
   /* MCU Configuration--------------------------------------------------------*/
@@ -99,30 +90,17 @@ int main(void)
   MX_GPIO_Init();
   MX_USART2_UART_Init();
   /* USER CODE BEGIN 2 */
-  HAL_UART_Receive_IT(&huart2, &tmpRx, 1);
+  HAL_UART_Receive_IT(&huart2, buffer, 10);
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
   while (1)
   {
-    // 等待按键按下，同时接收来自上位机的信息
-    HAL_UART_Transmit(&huart2, (uint8_t *)"* Listening\n", 12, 1000);
-    while (HAL_GPIO_ReadPin(Button_GPIO_Port, Button_Pin) == GPIO_PIN_SET) //等待按键按下
-      ;
-    while (HAL_GPIO_ReadPin(Button_GPIO_Port, Button_Pin) == GPIO_PIN_RESET) //等待按键松开
-      ;
-    
-    // 将接收到的字符串原样发送回去
-    HAL_UART_Transmit(&huart2, (uint8_t *)"* Echoing\n", 10, 1000);
-    while (BufRx.size) //检查是否发送完毕
-    {
-      uint16_t length = read(str, &BufRx, '\n'); //通过LF分割字符串
-      HAL_UART_Transmit(&huart2, (uint8_t *)str, length, 1000);
-    }
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
+    HAL_Delay(1000);
   }
   /* USER CODE END 3 */
 }
@@ -151,7 +129,8 @@ void SystemClock_Config(void)
   }
   /** Initializes the CPU, AHB and APB busses clocks 
   */
-  RCC_ClkInitStruct.ClockType = RCC_CLOCKTYPE_HCLK | RCC_CLOCKTYPE_SYSCLK | RCC_CLOCKTYPE_PCLK1 | RCC_CLOCKTYPE_PCLK2;
+  RCC_ClkInitStruct.ClockType = RCC_CLOCKTYPE_HCLK|RCC_CLOCKTYPE_SYSCLK
+                              |RCC_CLOCKTYPE_PCLK1|RCC_CLOCKTYPE_PCLK2;
   RCC_ClkInitStruct.SYSCLKSource = RCC_SYSCLKSOURCE_PLLCLK;
   RCC_ClkInitStruct.AHBCLKDivider = RCC_SYSCLK_DIV1;
   RCC_ClkInitStruct.APB1CLKDivider = RCC_HCLK_DIV2;
@@ -165,21 +144,21 @@ void SystemClock_Config(void)
 
 /* USER CODE BEGIN 4 */
 
-uint16_t read(char *str, buffer *buf, char end)
-{
-  uint16_t length = 0;
-  do
-  {
-    *str = pop(buf);
-    length++;
-  } while ((*str++) != end && buf->size > 0);
-  return length;
-}
-
 void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 {
-  push(&BufRx, tmpRx);
-  HAL_UART_Receive_IT(huart, &tmpRx, 1);
+  if (huart == &huart2)
+  {
+    HAL_UART_Receive_IT(huart, buffer, 10);
+    HAL_UART_Transmit_IT(huart, (uint8_t *)"Recieved 10 bytes\n", 19);
+  }
+}
+
+void HAL_UART_TxCpltCallback(UART_HandleTypeDef *huart)
+{
+  if (huart == &huart2)
+  {
+    HAL_GPIO_TogglePin(LED_GPIO_Port, LED_Pin);
+  }
 }
 
 /* USER CODE END 4 */
@@ -196,7 +175,7 @@ void Error_Handler(void)
   /* USER CODE END Error_Handler_Debug */
 }
 
-#ifdef USE_FULL_ASSERT
+#ifdef  USE_FULL_ASSERT
 /**
   * @brief  Reports the name of the source file and the source line number
   *         where the assert_param error has occurred.
@@ -205,7 +184,7 @@ void Error_Handler(void)
   * @retval None
   */
 void assert_failed(uint8_t *file, uint32_t line)
-{
+{ 
   /* USER CODE BEGIN 6 */
   /* User can add his own implementation to report the file name and line number,
      tex: printf("Wrong parameters value: file %s on line %d\r\n", file, line) */
