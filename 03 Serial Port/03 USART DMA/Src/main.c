@@ -110,7 +110,6 @@ a efficitur nisi. Ut a commodo elit. Nulla in lacinia lorem. Donec erat \
 ligula, hendrerit egestas lectus eu, dignissim ullamcorper metus. \
 Quisque fringilla non urna in condimentum. Curabitur pulvinar massa \
 eget sapien molestie.";
-uint8_t TxBuffer[4096];
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -155,8 +154,7 @@ int main(void)
   MX_DMA_Init();
   MX_USART2_UART_Init();
   /* USER CODE BEGIN 2 */
-  HAL_DMA_Start(&hdma_memtomem_dma1_channel1, (uint32_t)Nonsense, (uint32_t)TxBuffer, sizeof(Nonsense));
-  HAL_UART_Transmit_DMA(&huart2, TxBuffer, sizeof(Nonsense));
+  HAL_UART_Transmit_DMA(&huart2, (uint8_t *)Nonsense, sizeof(Nonsense));
   /* USER CODE END 2 */
 
   /* Infinite loop */
