@@ -17,7 +17,6 @@
   ******************************************************************************
   */
 /* USER CODE END Header */
-
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
 #include "gpio.h"
@@ -100,17 +99,17 @@ int main(void)
 
     // 逐个控制LED闪烁
     HAL_GPIO_WritePin(LED_GPIO_Port, LED_Pin, GPIO_PIN_SET);   //点亮LED
-    HAL_Delay(1000);                                           // 等待1秒
+    HAL_Delay(1000);                                           // 等待1�?
     HAL_GPIO_WritePin(LED_GPIO_Port, LED_Pin, GPIO_PIN_RESET); //熄灭LED
-    HAL_Delay(2000);                                           //等待2秒
+    HAL_Delay(2000);                                           //等待2�?
     HAL_GPIO_WritePin(LED_GPIO_Port, LED_Pin, GPIO_PIN_SET);   //点亮LED
-    HAL_Delay(1000);                                           //等待1秒
+    HAL_Delay(1000);                                           //等待1�?
 
-    // 连续闪烁10次
+    // 连续闪烁10�?
     for (uint8_t i = 0; i < 20; i++) //闪烁十次代表变化了二十次电平
     {
-      HAL_GPIO_TogglePin(LED_GPIO_Port, LED_Pin); //变化引脚上电平
-      HAL_Delay(100);                             //等待0.1秒。每两次闪烁间时间为0.1秒，故频率为5Hz
+      HAL_GPIO_TogglePin(LED_GPIO_Port, LED_Pin); //变化引脚上电�?
+      HAL_Delay(100);                             //等待0.1秒�?�每两次闪烁间时间为0.1秒，故频率为5Hz
     }
     HAL_GPIO_WritePin(LED_GPIO_Port, LED_Pin, GPIO_PIN_RESET); //熄灭LED
 
@@ -124,7 +123,7 @@ int main(void)
           ;
         HAL_Delay(1); //延时消抖
 
-      } while (HAL_GPIO_ReadPin(Button_GPIO_Port, Button_Pin) == GPIO_PIN_SET); //第二次检测
+      } while (HAL_GPIO_ReadPin(Button_GPIO_Port, Button_Pin) == GPIO_PIN_SET); //第二次检�?
 
       // 等待按键松开
       do
@@ -133,7 +132,7 @@ int main(void)
           ;
         HAL_Delay(1); //延时等待
 
-      } while (HAL_GPIO_ReadPin(Button_GPIO_Port, Button_Pin) == GPIO_PIN_RESET); //第二次检测
+      } while (HAL_GPIO_ReadPin(Button_GPIO_Port, Button_Pin) == GPIO_PIN_RESET); //第二次检�?
     }
   }
   /* USER CODE END 3 */
@@ -148,7 +147,8 @@ void SystemClock_Config(void)
   RCC_OscInitTypeDef RCC_OscInitStruct = {0};
   RCC_ClkInitTypeDef RCC_ClkInitStruct = {0};
 
-  /** Initializes the CPU, AHB and APB busses clocks 
+  /** Initializes the RCC Oscillators according to the specified parameters
+  * in the RCC_OscInitTypeDef structure.
   */
   RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSE;
   RCC_OscInitStruct.HSEState = RCC_HSE_ON;
@@ -161,9 +161,10 @@ void SystemClock_Config(void)
   {
     Error_Handler();
   }
-  /** Initializes the CPU, AHB and APB busses clocks 
+  /** Initializes the CPU, AHB and APB buses clocks
   */
-  RCC_ClkInitStruct.ClockType = RCC_CLOCKTYPE_HCLK | RCC_CLOCKTYPE_SYSCLK | RCC_CLOCKTYPE_PCLK1 | RCC_CLOCKTYPE_PCLK2;
+  RCC_ClkInitStruct.ClockType = RCC_CLOCKTYPE_HCLK|RCC_CLOCKTYPE_SYSCLK
+                              |RCC_CLOCKTYPE_PCLK1|RCC_CLOCKTYPE_PCLK2;
   RCC_ClkInitStruct.SYSCLKSource = RCC_SYSCLKSOURCE_PLLCLK;
   RCC_ClkInitStruct.AHBCLKDivider = RCC_SYSCLK_DIV1;
   RCC_ClkInitStruct.APB1CLKDivider = RCC_HCLK_DIV2;
@@ -191,7 +192,7 @@ void Error_Handler(void)
   /* USER CODE END Error_Handler_Debug */
 }
 
-#ifdef USE_FULL_ASSERT
+#ifdef  USE_FULL_ASSERT
 /**
   * @brief  Reports the name of the source file and the source line number
   *         where the assert_param error has occurred.
