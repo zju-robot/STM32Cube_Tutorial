@@ -24,7 +24,7 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-
+#include "math.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -50,6 +50,14 @@
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
 /* USER CODE BEGIN PFP */
+
+/**
+ * @brief 按照L298N逻辑驱动电机。
+ *        其中默认通道一输出高、通道二输出低时为正转
+ * 
+ * @param duty 将要输出的占空比，范围在-1到1之间
+ */
+void drive(float duty);
 
 /* USER CODE END PFP */
 
@@ -88,17 +96,24 @@ int main(void)
   MX_GPIO_Init();
   MX_TIM1_Init();
   /* USER CODE BEGIN 2 */
-  HAL_TIM_PWM_Start(&htim1, TIM_CHANNEL_1 | TIM_CHANNEL_2);
-  HAL_TIM_OC_Start(&htim1, TIM_CHANNEL_1);
+  HAL_TIM_PWM_Start(&htim1, TIM_CHANNEL_1);
+  HAL_TIM_PWM_Start(&htim1, TIM_CHANNEL_2);
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
+  float t = 0;
   while (1)
   {
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
+    t += 0.01;
+    drive(sinf(t) * 0.5);
+    HAL_Delay(10);
+
+    if(t >= M_PI)
+      t = -M_PI;
   }
   /* USER CODE END 3 */
 }
@@ -116,7 +131,7 @@ void SystemClock_Config(void)
   * in the RCC_OscInitTypeDef structure.
   */
   RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSE;
-  RCC_OscInitStruct.HSEState = RCC_HSE_ON;
+  RCC_OscInitStruct.HSEState = RCC_HSE_BYPASS;
   RCC_OscInitStruct.HSEPredivValue = RCC_HSE_PREDIV_DIV1;
   RCC_OscInitStruct.HSIState = RCC_HSI_ON;
   RCC_OscInitStruct.PLL.PLLState = RCC_PLL_ON;
@@ -142,10 +157,29 @@ void SystemClock_Config(void)
 }
 
 /* USER CODE BEGIN 4 */
-void HAL_TIM_OC_DelayElapsedCallback(TIM_HandleTypeDef *htim)
+
+void drive(float duty)
 {
-  UNUSED(htim);
+  if(duty > 0)
+  {
+    // 占空比值为正，正向旋转，通道一输出PWM，通道二输出低电平
+    __HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_1, (duty > 1 ? 1 : duty) * 36000);
+    __HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_2, 0);
+  }
+  else if(duty < 0)
+  {
+    // 占空比值为负，反向旋转，通道一输出低电平，通道二输出PWM
+    __HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_1, 0);
+    __HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_2, (duty < -1 ? -1 : duty) * 36000);
+  }
+  else
+  {
+    // 占空比值为零，两路通道都输出低电平
+    __HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_1, 0);
+    __HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_2, 0);
+  }
 }
+
 /* USER CODE END 4 */
 
 /**
