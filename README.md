@@ -4,6 +4,10 @@
 
 为了使干事能快速学会怎样使用STM32完成机器人制作过程中的各个需求，机协启动了自己的STM32教程的编写。该仓库存储了这套教程中所有的例程，以方便同学们在照着教程实现功能时有一个完整的工程可供参考而不至于陷入无头苍蝇的境地。虽然教程中的讲解已经足够详细，但是毕竟没有提供完整的代码文件。该仓库中将存储例程的代码文件和STM32CubeMX文件，用户经过简单的操作就可以构建完整的工程。
 
+## 特别注意
+
+例程中均按照教材所用开发板所搭载单片机STM32F103RB为例配置，包括STM32CubeMX中的配置以及上述的PlatformIO配置。如果同学们使用的是其他芯片，则需要自行创建工程、按照自己的开发板配置。切勿盲目复制例程代码。
+
 ## 结构
 
 本仓库中工程完全按照教材的结构布置，对应每章中引用到的相关工程。每个工程下的文件结构如下：
@@ -20,31 +24,22 @@
 
 ### PlatformIO
 
-进入代码所在的文件夹，打开终端，执行：
-
-```powershell
-pio init --ide vscode -b genericSTM32F103RB --project-option="framework=stm32cube" --project-option="debug_tool=stlink"
-```
-
-其中`--ide`参数指的是当前使用的编辑器。此处以Visual Studio Code为例；可以更改为自己使用的编辑器，详见`pio init -h`。
-
-`-b`参数指的是该工程将要使用的开发板，此处以STM32F103RB为例。该仓库各例程适用于F1系列的各个芯片，可以修改为自己使用的MCU；可使用的开发板列表见`pio boards`。
-
-或者嫌命令太长的话，可以简单地执行：
-
-```powershell
-pio init --ide vscode -b genericSTM32F103RB
-```
-
-然后进入platformio.ini文件，修改为：
+进入代码所在的文件夹，创建文本文件platformio.ini，向其中写入：
 
 ```ini
-[env:genericSTM32F103RB]
+[platformio]
+src_dir = ./Src
+include_dir = ./Inc
+
+[env:stm32cube_tutorial]
 platform = ststm32
 board = genericSTM32F103RB
 framework = stm32cube
 debug_tool = stlink
+upload_protocol = stlink
 ```
+
+然后使用Visual Studio Code或其他安装了PlatformIO插件的编辑器打开该文件夹，便可识别出PlatformIO工程。
 
 ### Keil
 
